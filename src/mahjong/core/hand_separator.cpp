@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <fstream>
 
+#include "core/AppContext.hpp"
 #include "mahjong/core/utils.hpp"
 
 namespace mahjong
@@ -30,9 +31,9 @@ bool HandSeparator::initialize()
         return true; // 初期化済み
 
     boost::filesystem::path s_tbl_path =
-        boost::dll::program_location().parent_path() / "suits_patterns.json";
+        boost::filesystem::path(get_data_path()) / "suits_patterns.json";
     boost::filesystem::path z_tbl_path =
-        boost::dll::program_location().parent_path() / "honors_patterns.json";
+        boost::filesystem::path(get_data_path()) / "honors_patterns.json";
 
     return make_table(s_tbl_path.string(), s_tbl_) &&
            make_table(z_tbl_path.string(), z_tbl_);

@@ -137,6 +137,9 @@ if(BUILD_PYTHON_MODULE)
   install(TARGETS _mahjong_calculator
         LIBRARY
         DESTINATION mahjong_calculator)
+
+  install(DIRECTORY ${CMAKE_SOURCE_DIR}/data/config/
+          DESTINATION mahjong_calculator/data)
 endif()
 
 # server program
