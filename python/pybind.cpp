@@ -30,15 +30,11 @@ std::string create_response_wrapper(const std::string &json_request)
         // 2. Requestオブジェクトを生成
         Request req = parse_request_doc(doc);
 
-        // 3. レスポンス用のDocumentを準備
-        rapidjson::Document res_doc;
-        res_doc.SetObject();
+        // 3. 指定されたメイン関数を呼び出す
+        rapidjson::Document res_doc = create_response(req);
 
-        // 4. 指定されたメイン関数を呼び出す
-        rapidjson::Value res_val = create_response(req, res_doc);
-
-        // 5. 結果をJSON文字列に変換して返す
-        return to_json_str(res_val);
+        // 4. 結果をJSON文字列に変換して返す
+        return to_json_str(res_doc);
     }
     catch (const std::exception &e) {
         // C++の例外をPythonのValueErrorに変換して送出

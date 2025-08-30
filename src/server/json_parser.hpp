@@ -21,7 +21,7 @@ void parse_json(const std::string &json, rapidjson::Document &doc);
 Request parse_request_doc(const rapidjson::Document &doc);
 Request create_request(const rapidjson::Value &doc);
 void validate_request(const Request &req);
-rapidjson::Value create_response(const Request &req, rapidjson::Document &doc);
+rapidjson::Document create_response(const Request &req);
 rapidjson::Value dump_necessary_tiles(const std::vector<std::tuple<int, int>> &tiles,
                                       rapidjson::Document &doc);
 rapidjson::Value dump_string(const std::string &str, rapidjson::Document &doc);

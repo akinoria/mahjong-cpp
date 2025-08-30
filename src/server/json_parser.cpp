@@ -255,11 +255,12 @@ rapidjson::Value dump_string(const std::string &str, rapidjson::Document &doc)
     return value;
 }
 
-rapidjson::Value create_response(const Request &req, rapidjson::Document &doc)
+rapidjson::Document create_response(const Request &req)
 {
     using namespace mahjong;
 
-    rapidjson::Value res_val(rapidjson::kObjectType);
+    rapidjson::Document doc;
+    doc.SetObject();
 
     // shanten number
     ///////////////////////////////
@@ -282,7 +283,7 @@ rapidjson::Value create_response(const Request &req, rapidjson::Document &doc)
     shanten_val.AddMember("seven_pairs", seven_pairs_shanten, doc.GetAllocator());
     shanten_val.AddMember("thirteen_orphans", thirteen_orphans_shanten,
                           doc.GetAllocator());
-    res_val.AddMember("shanten", shanten_val, doc.GetAllocator());
+    doc.AddMember("shanten", shanten_val, doc.GetAllocator());
 
     // expected score
     ///////////////////////////////
@@ -313,9 +314,9 @@ rapidjson::Value create_response(const Request &req, rapidjson::Document &doc)
     const auto elapsed_ms =
         std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 
-    res_val.AddMember("stats", dump_expected_score(stats, doc), doc.GetAllocator());
-    res_val.AddMember("searched", searched, doc.GetAllocator());
-    res_val.AddMember("time", elapsed_ms, doc.GetAllocator());
+    doc.AddMember("stats", dump_expected_score(stats, doc), doc.GetAllocator());
+    doc.AddMember("searched", searched, doc.GetAllocator());
+    doc.AddMember("time", elapsed_ms, doc.GetAllocator());
 
     rapidjson::Value config_val(rapidjson::kObjectType);
     config_val.AddMember("t_min", config.t_min, doc.GetAllocator());
@@ -325,7 +326,7 @@ rapidjson::Value create_response(const Request &req, rapidjson::Document &doc)
     config_val.AddMember("shanten_type", config.shanten_type, doc.GetAllocator());
     config_val.AddMember("calc_stats", config.calc_stats, doc.GetAllocator());
     config_val.AddMember("num_tiles", num_tiles, doc.GetAllocator());
-    res_val.AddMember("config", config_val, doc.GetAllocator());
+    doc.AddMember("config", config_val, doc.GetAllocator());
 
-    return res_val;
+    return doc;
 }
