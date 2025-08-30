@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
 project(mahjong-cpp VERSION 0.9.1)
 
+# プロジェクト全体で-fPICを有効にし、共有ライブラリのビルドエラーを防ぐ
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -26,7 +29,8 @@ if(MSVC)
 endif()
 
 # Boost
-set(Boost_USE_STATIC_LIBS ON)
+# Boostの共有ライブラリ(.so)を使うように変更
+set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost REQUIRED COMPONENTS filesystem system)
@@ -63,9 +67,15 @@ else()
   message(STATUS "Use fetched spdlog")
 endif()
 
-option(BUILD_SERVER "build server programs." ON)
+# Python & pybind11
+find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+# プロジェクト内のpybind11をサブディレクトリとしてビルドに含める
+add_subdirectory(pybind11)
+
+option(BUILD_SERVER "build server programs." OFF)
 option(BUILD_TEST "build test programs." OFF)
-option(BUILD_SAMPLES "build sample programs." ON)
+option(BUILD_SAMPLES "build sample programs." OFF)
+option(BUILD_PYTHON_MODULE "Build the pybind11 Python module." ON)
 
 # Build mahjong-cpp
 
@@ -77,22 +87,57 @@ elseif(CMAKE_C_COMPILER_ID STREQUAL "GNU")
 endif()
 
 include_directories(src)
+# [修正] 共有ディレクトリであるsrc/coreをインクルードパスに追加
+include_directories(src/core)
 
 # Define variables
 set(LIB_NAME mahjong-cpp)
 
 file(GLOB_RECURSE SRC_FILES src/mahjong/*.cpp)
+# [修正] コアライブラリに共通機能とパーサー機能を追加
+list(APPEND SRC_FILES
+    src/core/AppContext.cpp
+    src/server/json_parser.cpp
+)
 add_library(${LIB_NAME} ${SRC_FILES})
+
 if (MSVC)
-  target_link_libraries(${LIB_NAME} ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} spdlog)
+  target_link_libraries(${LIB_NAME} PUBLIC ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} spdlog)
 else()
-  target_link_libraries(${LIB_NAME} ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} spdlog::spdlog -static-libgcc -static-libstdc++)
+  target_link_libraries(${LIB_NAME} PUBLIC ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} spdlog::spdlog -static-libgcc -static-libstdc++)
 endif()
+
+target_include_directories(${LIB_NAME} PUBLIC
+    $<TARGET_PROPERTY:spdlog,INTERFACE_INCLUDE_DIRECTORIES>
+)
 
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "default install path" FORCE)
 endif()
+# このinstallコマンドはPythonパッケージとは無関係なので、必要に応じて残してください
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/data/config/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+
+# python module
+if(BUILD_PYTHON_MODULE)
+  message(STATUS "Building Python module...")
+
+  # [修正] Pythonモジュールのソースはpybind.cppのみにする
+  # (他の機能はmahjong-cppライブラリからリンク経由で利用する)
+  pybind11_add_module(_mahjong_calculator
+      python/pybind.cpp
+  )
+
+  target_link_libraries(_mahjong_calculator PRIVATE ${LIB_NAME})
+
+  target_compile_definitions(_mahjong_calculator PRIVATE
+      PROJECT_NAME="${PROJECT_NAME}"
+      PROJECT_VERSION="${${PROJECT_NAME}_VERSION}"
+  )
+
+  install(TARGETS _mahjong_calculator
+        LIBRARY
+        DESTINATION mahjong_calculator)
+endif()
 
 # server program
 if(BUILD_SERVER)

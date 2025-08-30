@@ -5,6 +5,7 @@
 #include <cassert>
 
 #include <boost/dll.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/graph/graph_utility.hpp>
 
 #include "mahjong/core/necessary_tile_calculator.hpp"
@@ -603,10 +604,10 @@ ExpectedScoreCalculator::calc(const Config &_config, const Round &round,
     return {stats, searched};
 }
 
-bool ExpectedScoreCalculator::load_uradora_table()
+bool ExpectedScoreCalculator::load_uradora_table(const std::string &data_path)
 {
     boost::filesystem::path path =
-        boost::dll::program_location().parent_path() / "uradora.bin";
+        boost::filesystem::path(data_path) / "uradora.bin";
     std::ifstream ifs(path.string(), std::ios::binary);
     ifs.read(reinterpret_cast<char *>(&uradora_table_), sizeof(uradora_table_));
 
@@ -615,13 +616,6 @@ bool ExpectedScoreCalculator::load_uradora_table()
     return true;
 }
 
-ExpectedScoreCalculator::ExpectedScoreCalculator()
-{
-    load_uradora_table();
-}
-
 std::array<std::array<double, 13>, 6> ExpectedScoreCalculator::uradora_table_;
-
-static ExpectedScoreCalculator inst;
 
 } // namespace mahjong

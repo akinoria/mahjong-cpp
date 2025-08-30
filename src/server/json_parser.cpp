@@ -1,4 +1,5 @@
 #include "json_parser.hpp"
+#include "core/AppContext.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -58,7 +59,7 @@ void parse_json(const std::string &json, rapidjson::Document &doc)
     }
 
     boost::filesystem::path schema_path =
-        boost::dll::program_location().parent_path() / "request_schema.json";
+        boost::filesystem::path(get_data_path()) / "request_schema.json";
 
     // Open JSON schema.
     std::ifstream ifs(schema_path.string());

@@ -1,4 +1,4 @@
-#ifndef MAHJONG_CPP_EXPECTED_SCORE_CALCULATOR
+#ifndef MAHJ-ONG_CPP_EXPECTED_SCORE_CALCULATOR
 #define MAHJONG_CPP_EXPECTED_SCORE_CALCULATOR
 
 #include <map>
@@ -131,8 +131,6 @@ class ExpectedScoreCalculator
     static std::array<std::array<double, 13>, 6> uradora_table_;
 
   public:
-    ExpectedScoreCalculator();
-
     static std::tuple<std::vector<Stat>, int>
     calc(const Config &config, const Round &round, const Player &player);
 
@@ -142,6 +140,7 @@ class ExpectedScoreCalculator
                                                    const Count &wall);
     static Count create_wall(const Round &round, const Player &player,
                              bool enable_reddora);
+    static bool load_uradora_table(const std::string &data_path);
 
   private:
     static CountRed encode(const Count &counts, const bool enable_reddora);
@@ -167,7 +166,6 @@ class ExpectedScoreCalculator
                            const Cache &cache2);
     static std::tuple<int, std::vector<std::tuple<int, int>>>
     get_necessary_tiles(const Config &config, const Player &player, const Count &wall);
-    static bool load_uradora_table();
 };
 } // namespace mahjong
 

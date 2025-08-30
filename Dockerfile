@@ -10,14 +10,11 @@ RUN apt-get update && \
     ca-certificates \
     cmake \
     git \
-    libboost-all-dev
-
-# Install SSH server
-RUN apt-get install -y --no-install-recommends openssh-server && \
-    echo "root:root" | chpasswd && \
-    sed -i "s/#PermitRootLogin prohibit-password/PermitRootLogin yes/" /etc/ssh/sshd_config
+    libboost-all-dev \
+    python3-dev \
+    ninja-build \
+    pip
 
 RUN rm -rf /var/lib/apt/lists/*
 
-EXPOSE 22
-CMD service ssh start && /bin/bash
+WORKDIR /mahjong-cpp

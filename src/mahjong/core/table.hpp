@@ -31,14 +31,24 @@ class Table
     using TableType = std::array<int32_t, 30>;
     using HashType = int32_t;
 
-    Table();
+    static Table &get_instance()
+    {
+        static Table instance;
+        return instance;
+    }
+
+    Table(const Table &) = delete;
+    Table &operator=(const Table &) = delete;
+
+    bool initialize(const std::string &data_path);
+
     template <typename ForwardIterator>
     static HashType suits_hash(ForwardIterator first, ForwardIterator last);
     template <typename ForwardIterator>
     static HashType honors_hash(ForwardIterator first, ForwardIterator last);
 
   private:
-    static bool initialize();
+    Table() = default;
     template <size_t TableSize>
     static bool load_table(const std::string &filepath,
                            std::array<TableType, TableSize> &table);

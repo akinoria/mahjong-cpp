@@ -1,0 +1,37 @@
+# pyproject.toml
+
+# ===================================================================
+# 1. ビルドシステムの設定
+# pipに「このプロジェクトのビルドにはscikit-build-coreが必要」と伝える
+# ===================================================================
+[build-system]
+requires = ["scikit-build-core"]
+build-backend = "scikit_build_core.build"
+
+# ===================================================================
+# 2. プロジェクトのメタデータ
+# パッケージ名やバージョンなどを定義
+# ===================================================================
+[project]
+name = "mahjong_calculator"
+version = "0.9.1" # CMakeLists.txtのバージョンと合わせる
+description = "Python bindings for the C++ Mahjong Expected Score Calculator"
+readme = "README.md"
+license = { text = "GPL-3.0" } # プロジェクトのライセンスに合わせて変更
+requires-python = ">=3.8"
+
+# ===================================================================
+# 3. scikit-build-core の設定
+# CMakeに渡す引数などを指定
+# ===================================================================
+[tool.scikit-build]
+# CMakeに渡す引数を設定
+cmake.args = [
+    "-DBUILD_PYTHON_MODULE=ON", # Pythonモジュールを有効化
+    "-DBUILD_SERVER=OFF",       # サーバーはビルドしない
+    "-DBUILD_TEST=OFF",         # テストはビルドしない
+    "-DCMAKE_BUILD_TYPE=Release"
+]
+
+# wheel (パッケージ) に含めるファイルを指定
+wheel.packages = ["mahjong_calculator"] # pybindモジュールが配置されるディレクトリ
