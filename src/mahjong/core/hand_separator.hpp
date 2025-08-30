@@ -12,12 +12,12 @@ namespace mahjong
 class HandSeparator
 {
   public:
-    HandSeparator();
     static bool initialize();
     static std::vector<std::tuple<std::vector<Block>, int>>
     separate(const Player &player, const int win_tile, const int win_flag);
 
   private:
+    HandSeparator();
     static bool make_table(const std::string &path,
                            std::map<int, std::vector<std::vector<Block>>> &table);
     static std::vector<Block> get_blocks(const std::string &s);

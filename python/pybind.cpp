@@ -46,6 +46,7 @@ std::string create_response_wrapper(const std::string &json_request)
 void initialize_wrapper(const std::string &path)
 {
     initialize_data_path(path);
+    mahjong::HandSeparator::initialize();
 }
 
 PYBIND11_MODULE(_mahjong_calculator, m)

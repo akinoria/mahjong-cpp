@@ -15,10 +15,7 @@
 namespace mahjong
 {
 
-HandSeparator::HandSeparator()
-{
-    initialize();
-}
+HandSeparator::HandSeparator() = default;
 
 /**
  * @brief 初期化する。
@@ -50,6 +47,8 @@ bool HandSeparator::initialize()
 std::vector<std::tuple<std::vector<Block>, int>>
 HandSeparator::separate(const Player &player, const int win_tile, const int win_flag)
 {
+    initialize();
+
     std::vector<std::tuple<std::vector<Block>, int>> pattern;
     std::vector<Block> blocks(5);
     int i = 0;
@@ -322,6 +321,5 @@ void HandSeparator::create_block_patterns(
 
 std::map<int, std::vector<std::vector<Block>>> HandSeparator::s_tbl_;
 std::map<int, std::vector<std::vector<Block>>> HandSeparator::z_tbl_;
-static HandSeparator inst;
 
 } // namespace mahjong
